@@ -1,0 +1,1 @@
+bin/IndexTI data/bogota-cadastral-2019-3-All-HourlyAggregate.csv data/bogota2019All-HrlyAg.bin data/indexedTravInf.bin data/indexTable.bin

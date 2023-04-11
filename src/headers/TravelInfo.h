@@ -16,8 +16,8 @@ struct TRAVELINFO
 int strFileToTravInf(TravelInfo *info, FILE *file){
     return fscanf(
         file, "%i,%i,%i,%f,%f,%f,%f",
-        info->srcId, info->destId, info->hourOD,
-        info->meanTime, info->stdDev, info->geomMeanTime, info->geomstdDev
+        &(info->srcId), &(info->destId), &(info->hourOD),
+        &(info->meanTime), &(info->stdDev), &(info->geomMeanTime), &(info->geomstdDev)
     );
 }
 

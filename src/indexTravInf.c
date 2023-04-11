@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <headers/Index.h>
 #include <headers/TravelInfo.h>
 #include <headers/TravInfFID.h>
@@ -124,10 +125,14 @@ void csvToBin(FILE *input, FILE *output){
         if(cycles > 100000){
             cycles = 0;
             printf("%%%f\n", ((float)ftell(input))/inEnd *100.0);
+            //printTravI(info);
         }
         /*-------------*/
 
         int erno = strFileToTravInf(&info, input);
+
+
+
         fwrite(&info, sizeof(TravelInfo), 1, output);
 
         /*---logging---*/
@@ -161,6 +166,7 @@ int main(int argc, char *argv[]){
 
     csvToBin(input, binIO);
     fclose(input); fclose(binIO);
+    binIO = NULL;
 
     binIO = fopen(argv[2], "rb");
     if(!binIO){
@@ -169,18 +175,22 @@ int main(int argc, char *argv[]){
     }
     
 
-    output = fopen(argv[2], "wb");
+    output = fopen(argv[3], "wb");
     if(!output){
         printf("file {%s} failed to open", argv[3]);
         return -1;
     }
 
-    table = fopen(argv[3], "wb");
+    table = fopen(argv[4], "wb");
     if(!table){
         printf("file {%s} failed to open", argv[4]);
         return -1;
     }
 
-    saveIndexTable(table, IndexFile(binIO, output));
+    saveIndexTable(table, IndexFile(binIO, output));   
+
+    fclose(binIO);
+    remove(argv[2]);
+    
     return 0;
 }
