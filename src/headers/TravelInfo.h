@@ -20,3 +20,19 @@ int strFileToTravInf(TravelInfo *info, FILE *file){
         info->meanTime, info->stdDev, info->geomMeanTime, info->geomstdDev
     );
 }
+
+void printTravI(TravelInfo info){
+    printf(
+        "{\n"
+        "\tsrcid: %i\n"
+        "\tdestid: %i\n"
+        "\thod: %i\n"
+        "\tmeantime: %f\n"
+        "\tstddev: %f\n"
+        "\tgeomeantime: %f\n"
+        "\tgeostddev: %f\n"
+        "}\n",
+        info.srcId, info.destId, info.hourOD,
+        info.meanTime, info.stdDev, info.geomMeanTime, info.geomstdDev
+    );
+}

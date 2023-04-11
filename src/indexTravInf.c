@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <headers/Index.h>
 #include <headers/TravelInfo.h>
-#include <headers/TravInfFileStruct.h>
+#include <headers/TravInfFID.h>
 
 IndexNode* IndexFile(FILE* input, FILE* output){
 
@@ -12,6 +12,8 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     inEnd = ftell(input);
     fseek(input, 0, SEEK_SET);
     /*-------------*/
+
+    printf("----------Indexing and generating table------------\n");
     
     
     long prevIdOffset[1160];
@@ -22,7 +24,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     
     IndexNode *head, *tail;
     TravelInfo travInf;
-    TravInfFileStruct travInfFS;
+    TravInfFID travInfFS;
     Index index;
 
 
@@ -33,15 +35,15 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     travInfFS.info = travInf;
     travInfFS.nextOffset = -1;
 
-    index.ID = travInf.sourceId;
+    index.ID = travInf.srcId;
     index.ogOffset = currOutputPos;
 
     head = insertIndex(head, index);
     tail = head;
 
-    fwrite(&travInfFS, sizeof(TravInfFileStruct), 1, output);
+    fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
 
-    prevIdOffset[travInf.sourceId] = currOutputPos;
+    prevIdOffset[travInf.srcId] = currOutputPos;
 
     /*---logging---*/
     int cycles = 0;
@@ -63,27 +65,29 @@ IndexNode* IndexFile(FILE* input, FILE* output){
         travInfFS.info = travInf;
         travInfFS.nextOffset = -1;
 
-        if(prevIdOffset[travInf.sourceId - 1] < 0){
-            index.ID = travInf.sourceId;
+        if(prevIdOffset[travInf.srcId - 1] < 0){
+            index.ID = travInf.srcId;
             index.ogOffset = currOutputPos;
 
             tail = insertIndex(tail, index);
 
-            fwrite(&travInfFS, sizeof(TravInfFileStruct), 1, output);
+            fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
         }else{
-            fseek(output, prevIdOffset[travInf.sourceId - 1], SEEK_SET);
+            fseek(output, prevIdOffset[travInf.srcId - 1], SEEK_SET);
             fwrite(&currOutputPos, sizeof(long), 1, output);
 
             fseek(output, currOutputPos, SEEK_SET);
-            fwrite(&travInfFS, sizeof(TravInfFileStruct), 1, output);
+            fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
         }
 
-        prevIdOffset[travInf.sourceId - 1] = currOutputPos;
+        prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
         /*---logging---*/
         cycles++;
         /*-------------*/
     }
+
+    printf("----------Indexinf and table finished------------\n");
 
     return head;
 }
@@ -97,33 +101,86 @@ void saveIndexTable(FILE *file, IndexNode *node){
     }
 }
 
+void csvToBin(FILE *input, FILE *output){
+    /*---logging---*/
+    long inEnd;
+    fseek(input, 0, SEEK_END);
+    inEnd = ftell(input);
+    fseek(input, 0, SEEK_SET);
+    /*-------------*/
+
+    printf("----------conversion csv to bin------------\n");
+
+    char trash[200];
+    fscanf(input, "%199s", trash);
+
+    TravelInfo info;
+
+    /*---logging---*/
+    int cycles = 0;
+    /*-------------*/
+    while(!feof(input)){
+        /*---logging---*/
+        if(cycles > 100000){
+            cycles = 0;
+            printf("%%%f\n", ((float)ftell(input))/inEnd *100.0);
+        }
+        /*-------------*/
+
+        int erno = strFileToTravInf(&info, input);
+        fwrite(&info, sizeof(TravelInfo), 1, output);
+
+        /*---logging---*/
+        cycles++;
+        /*-------------*/
+    }
+
+    printf("----------conversion finished------------\n");
+}
+
 int main(int argc, char *argv[]){
-    if(argc != 4){
-        printf("usage: indexTI {inputFile} {outputFile} {outputTableFile}");
+    if(argc != 5){
+        printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}");
         return -1;
     }
 
-    FILE *input, *output, *table;
+    FILE *input, *binIO, *output, *table;
     long outStart;
 
-    input = fopen(argv[1], "rb");
+    input = fopen(argv[1], "r");
     if(!input){
         printf("file {%s} failed to open", argv[1]);
         return -1;
     }
 
+    binIO = fopen(argv[2], "wb");
+    if(!binIO){
+        printf("file {%s} failed to open", argv[2]);
+        return -1;
+    }
+
+    csvToBin(input, binIO);
+    fclose(input); fclose(binIO);
+
+    binIO = fopen(argv[2], "rb");
+    if(!binIO){
+        printf("file {%s} failed to open", argv[2]);
+        return -1;
+    }
+    
+
     output = fopen(argv[2], "wb");
     if(!output){
-        printf("file {%s} failed to open", argv[2]);
+        printf("file {%s} failed to open", argv[3]);
         return -1;
     }
 
     table = fopen(argv[3], "wb");
     if(!table){
-        printf("file {%s} failed to open", argv[3]);
+        printf("file {%s} failed to open", argv[4]);
         return -1;
     }
 
-    saveIndexTable(table, IndexFile(input, output));
+    saveIndexTable(table, IndexFile(binIO, output));
     return 0;
 }
