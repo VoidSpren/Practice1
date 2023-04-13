@@ -10,15 +10,7 @@
 #include <headers/Index.h>
 #include <headers/IndexHTable.h>
 
-int main(int argc, char* argv[]){
-    FILE *file = fopen(argv[1], "rb");
-    if(!file){
-        printf("file {%s} failed to open", argv[1]);
-        return -1;
-    }
-
-    IndexHTable table = createIndexHTable(1547);
-
+void readAndHashTable(FILE *file, IndexHTable *table){
     Index *list;
 
     fseek(file, 0, SEEK_END);
@@ -34,6 +26,20 @@ int main(int argc, char* argv[]){
 
         insertIndexHash(list[i].ID, list[i].ogOffset, &table);
     }
+
+    free(list);
+}
+
+int main(int argc, char* argv[]){
+    FILE *file = fopen(argv[1], "rb");
+    if(!file){
+        printf("file {%s} failed to open", argv[1]);
+        return -1;
+    }
+
+    IndexHTable table = createIndexHTable(1547);
+
+    
 
     printHTable(table);
 }
