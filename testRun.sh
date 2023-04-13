@@ -1,0 +1,1 @@
+bin/server data/indexTable.bin

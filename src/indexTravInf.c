@@ -60,7 +60,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
         currOutputPos = ftell(output);
 
         int count = fread(&travInf, sizeof(TravelInfo), 1, input);
-        if(count == 0) break;
+        if(feof(input)) break;
         //erno = fileStrToTravInf(&travInf, input);
 
         travInfFS.info = travInf;
