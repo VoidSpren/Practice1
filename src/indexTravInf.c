@@ -146,7 +146,7 @@ void csvToBin(FILE *input, FILE *output){
 
 int main(int argc, char *argv[]){
     if(argc != 5){
-        printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}");
+        printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}\n");
         return -1;
     }
 

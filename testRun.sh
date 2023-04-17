@@ -1,1 +1,1 @@
-bin/server 0 data/indexTable.bin notnow
+bin/server 1234 data/indexTable.bin data/indexedTravInf.bin
