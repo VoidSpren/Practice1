@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -39,11 +40,29 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     free(list);
 }
 
+int searchInFile(TravelInfo *info, long offset, FILE *input){
+    TravInfFID readedInfFID;
+
+    while(!feof(input) && offset >= 0){
+        fseek(input, offset, SEEK_SET);
+        fread(&readedInfFID, sizeof(TravInfFID), 1,input);
+
+        if(readedInfFID.info.destId == info->destId && readedInfFID.info.hourOD == info->hourOD){
+            (*info) = readedInfFID.info;
+            return 0;
+        }
+
+        offset = readedInfFID.nextOffset;
+    }
+
+    return -1;
+}
+
 int main(int argc, char* argv[]){
 
     //Se rectifica que los parametros de entrada sean menos de 3
-    if(argc < 4){
-        printf("usage: server {sharedMemName} {IndexTable} {IndexedInfo}");
+    if(argc != 4){
+        printf("usage: server {sharedMemName} {IndexTable} {IndexedInfo}\n");
         return -1;
     }
 
@@ -69,18 +88,64 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
+
+
+    shm_unlink(argv[1]);
+
     //Se esta abriendo una memoria nombrada compartida
     int memFd = shm_open(argv[1], O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     if(memFd < 0){
         printf("failed to create shared mem file descriptor with name: %s\n", argv[1]);
         return -1;
     }
-
-    //Se inicializa para que el server espere una nueva indicación de consulta
+    
+    int erno;
+    erno = ftruncate(memFd, 2*sizeof(SharedMSG));
+    if(erno < 0){
+        printf("failed to truncate to size\n");
+        return -1;
+    }   
     SharedMSG *shared = mmap(NULL, 2*sizeof(SharedMSG), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0);
 
+    erno = sem_init(&(shared->serverSem), 1, 0);
+    if(erno < 0){
+        printf("failed to initialize server ready semaphore\n");
+        return -1;
+    }
+    erno = sem_init(&(shared->clientSem), 1, 0);
+    if(erno < 0){
+        printf("failed to initialize client ready semaphore\n");
+        return -1;
+    }
+
     Index index;
-    TravInfFID infoFID;
+    TravelInfo info;
+
+    while(1){
+        shared->sharedStatus = SHARED_WAITING;
+        printf("server ready\n");
+
+        sem_post(&(shared->serverSem));
+        sem_wait(&(shared->clientSem));
+
+        printf("working... \n");
+
+        shared->sharedStatus = SHARED_NOT_READY;
+
+        info = shared->info;
+
+        int res = getIfExists(info.srcId, &index, &table);
+        if(res > 0){
+            res = searchInFile(&info, index.ogOffset, infoFile);
+            if(res > 0){
+                shared->info = info;
+            }else{
+                shared->sharedStatus = SHARED_NOT_FOUND;
+            }
+        }else{
+            shared->sharedStatus = SHARED_NOT_FOUND;
+        }
+    }
 
     return 0;
 }

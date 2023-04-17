@@ -147,7 +147,7 @@ void csvToBin(FILE *input, FILE *output){
 int main(int argc, char *argv[]){
     //Se comprueba que no alla errores al ingresar los 4 archivos requeridos
     if(argc != 5){
-        printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}");
+        printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}\n");
         return -1;
     }
 
