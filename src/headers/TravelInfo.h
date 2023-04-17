@@ -1,7 +1,10 @@
+//Implementa funciones requeridas para el paso de información de csv a binario
+
 #pragma once
 
 #include <stdio.h>
 
+//Estructura que guarda información de un viaje 
 struct TRAVELINFO
 {
     int srcId;
@@ -13,6 +16,7 @@ struct TRAVELINFO
     float geomstdDev;
 }typedef TravelInfo;
 
+//Lee el archivo csv y la información la guarda en una estructura travelinfo
 int strFileToTravInf(TravelInfo *info, FILE *file){
     return fscanf(
         file, "%i,%i,%i,%f,%f,%f,%f",
@@ -21,6 +25,7 @@ int strFileToTravInf(TravelInfo *info, FILE *file){
     );
 }
 
+//Imprime la información de un viaje
 void printTravI(TravelInfo info){
     printf(
         "{\n"
