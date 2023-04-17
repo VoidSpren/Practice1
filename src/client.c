@@ -9,17 +9,16 @@
 #include <headers/SharedMsg.h>
 #include <headers/TravelInfo.h>
 
-float consultMeanTime(TravelInfo info, SharedMSG *shared){
-    if(shared->sharedStatus == SHARED_WAITING){
-        shared->info = info;
+int consultMeanTime(TravelInfo *info, SharedMSG *shared){
+    if(shared->sharedStatus != SHARED_NOT_READY){
+        shared->info = (*info);
         sem_post(&(shared->clientSem));
         sem_wait(&(shared->serverSem));
 
-        printTravI(shared->info);
-        return shared->info.meanTime;
-    }else{
-        
+        (*info) = shared->info;
     }
+    
+    return shared->sharedStatus;
 }
 
 int main(int argc, char* argv[]){
@@ -83,7 +82,7 @@ int main(int argc, char* argv[]){
                 }
                 break;
             case 4:
-
+            
             case 5:
                 printf("cerrando...\n");
 
