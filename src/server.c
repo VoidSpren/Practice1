@@ -122,7 +122,6 @@ int main(int argc, char* argv[]){
     TravelInfo info;
 
     while(1){
-        shared->sharedStatus = SHARED_WAITING;
         printf("server ready\n");
 
         sem_post(&(shared->serverSem));
@@ -139,6 +138,7 @@ int main(int argc, char* argv[]){
             res = searchInFile(&info, index.ogOffset, infoFile);
             if(res > 0){
                 shared->info = info;
+                shared->sharedStatus = SHARED_SUCCESS;
             }else{
                 shared->sharedStatus = SHARED_NOT_FOUND;
             }
