@@ -4,16 +4,18 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <semaphore.h>
-
 #include <headers/TravelInfo.h>
 #include <headers/TravInfFID.h>
 #include <headers/Index.h>
 #include <headers/IndexHTable.h>
 #include <headers/SharedMsg.h>
 
+
+//Metodo que lee el archivo entrante y lo vuelve una hashtable
 void readAndHashTable(FILE *file, IndexHTable *table){
     Index *list;
 
+    
     fseek(file, 0, SEEK_END);
 
     list = (Index*)malloc(ftell(file));
@@ -31,6 +33,7 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     free(list);
 }
 
+//Iniciar el server y espera mensajes entrantes
 int main(int argc, char* argv[]){
 
     if(argc < 4){
