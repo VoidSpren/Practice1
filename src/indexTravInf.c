@@ -5,9 +5,10 @@
 #include <headers/TravelInfo.h>
 #include <headers/TravInfFID.h>
 
+//Se crea una lista enlazada de 
 IndexNode* IndexFile(FILE* input, FILE* output){
-
-    /*---logging---*/
+    /*---loggin--*/
+    //Se calcula el tamaño del archivo y se guarda en inEnd
     long inEnd;
     fseek(input, 0, SEEK_END);
     inEnd = ftell(input);
@@ -16,7 +17,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
     printf("----------Indexing and generating table------------\n");
     
-    
+    //Se crea un arreglo del tamaño 11160 y se llena con -1
     long prevIdOffset[1160];
     memset(prevIdOffset, -1, sizeof(prevIdOffset));
 
@@ -28,10 +29,10 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     TravInfFID infoFID;
     Index index;
 
-
+    //Se guarda la posicion de desplazamiento en bytes del archivo
+    //Luego se lee la información de un viaje y la guarda en la estrucutra travInf
     currOutputPos = ftell(output);
     fread(&travInf, sizeof(TravelInfo), 1, input);
-    //erno = fileStrToTravInf(&travInf, input);
 
     infoFID.info = travInf;
     infoFID.nextOffset = -1;
@@ -44,21 +45,25 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
     fwrite(&infoFID, sizeof(TravInfFID), 1, output);
 
+    //En la posición correpondiente del numero de origen - 1
+    //se guarda la posición donde leyó al archivo
     prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
-    /*---logging---*/
+    /*---loggin---*/
     int cycles = 0;
     /*-------------*/
     while(!feof(input)){
 
         /*---logging---*/
 
+        //Cada 100.000 ciclos muestra el porcentaje de avance
         if(cycles > 100000){
             cycles = 0;
             printf("%%%f\n", ((float)ftell(input))/inEnd *100.0);
         }
         /*-------------*/
 
+        //Se guarda la posición del archivo donde se esta leyendo
         currOutputPos = ftell(output);
 
         size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
@@ -84,7 +89,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
         prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
-        /*---logging---*/
+        /*---loggin---*/
         cycles++;
         /*-------------*/
     }
@@ -94,17 +99,20 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     return head;
 }
 
+//Recorre la lista enlazada y la guarda en un archivo binario
 void saveIndexTable(FILE *file, IndexNode *node){
 
     while (node != NULL)
     {
+        //Se escribe la información del nodo de la lista enlazada
         fwrite(&(node->index),sizeof(Index),1,file);
         node = node->next;
     }
 }
 
+//Pasa el csv a binario
 void csvToBin(FILE *input, FILE *output){
-    /*---logging---*/
+    //Se calcula la el tamaño en bytes del csv
     long inEnd;
     fseek(input, 0, SEEK_END);
     inEnd = ftell(input);
@@ -113,32 +121,32 @@ void csvToBin(FILE *input, FILE *output){
 
     printf("----------conversion csv to bin------------\n");
 
+    //Se lee hasta el salto de linea descartando los encabezados del csv
     char trash[200];
     fscanf(input, "%199s", trash);
 
     TravelInfo info;
 
-    /*---logging---*/
+    //Empieza la conversión y cuanta los ciclos
     int cycles = 0;
-    /*-------------*/
     while(!feof(input)){
-        /*---logging---*/
+        //Cada 100.000 ciclos muestra el porcentaje de avance 
         if(cycles > 100000){
             cycles = 0;
             printf("%%%f\n", ((float)ftell(input))/inEnd *100.0);
-            //printTravI(info);
         }
-        /*-------------*/
 
+        //Lee la información de un viaje y la guarda en un apuntador a la estructura info
         int erno = strFileToTravInf(&info, input);
+        
+        //Solo comprueba si ya termino de leer la información y evita leer la ultima vez
         if(feof(input)) break;
 
-
+        //Escribe la escructura info binario en el archivo output
         fwrite(&info, sizeof(TravelInfo), 1, output);
 
-        /*---logging---*/
+        //loging
         cycles++;
-        /*-------------*/
     }
 
     printf("----------conversion finished------------\n");
@@ -175,26 +183,29 @@ int main(int argc, char *argv[]){
     fclose(binIO);
     binIO = NULL;
 
-    //
+    //Se abre el archivo para leer el csv en binario
     binIO = fopen(argv[2], "rb");
     if(!binIO){
         printf("file {%s} failed to open", argv[2]);
         return -1;
     }
     
-
+    //Se abre el archivo para escribir el indexado en binario
     output = fopen(argv[3], "wb");
     if(!output){
         printf("file {%s} failed to open", argv[3]);
         return -1;
     }
 
+    //Se abre un archivo para guardar la lista enlazda de las primeras apariciones
     table = fopen(argv[4], "wb");
     if(!table){
         printf("file {%s} failed to open", argv[4]);
         return -1;
     }
 
+    //Se crea una lista enlazada de las primeras apariciones para cada origen y su indice
+    //Luego se guarda esta lista en un archivo binario
     saveIndexTable(table, IndexFile(binIO, output));   
 
     fclose(binIO);
