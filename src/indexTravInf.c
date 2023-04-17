@@ -25,7 +25,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     
     IndexNode *head, *tail;
     TravelInfo travInf;
-    TravInfFID travInfFS;
+    TravInfFID infoFID;
     Index index;
 
 
@@ -33,24 +33,26 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     fread(&travInf, sizeof(TravelInfo), 1, input);
     //erno = fileStrToTravInf(&travInf, input);
 
-    travInfFS.info = travInf;
-    travInfFS.nextOffset = -1;
+    infoFID.info = travInf;
+    infoFID.nextOffset = -1;
 
     index.ID = travInf.srcId;
     index.ogOffset = currOutputPos;
 
-    head = insertIndex(head, index);
+    head = insertIndex(NULL, index);
     tail = head;
 
-    fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
+    fwrite(&infoFID, sizeof(TravInfFID), 1, output);
 
-    prevIdOffset[travInf.srcId] = currOutputPos;
+    prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
     /*---logging---*/
     int cycles = 0;
     /*-------------*/
     while(!feof(input)){
+
         /*---logging---*/
+
         if(cycles > 100000){
             cycles = 0;
             printf("%%%f\n", ((float)ftell(input))/inEnd *100.0);
@@ -59,12 +61,11 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
         currOutputPos = ftell(output);
 
-        int count = fread(&travInf, sizeof(TravelInfo), 1, input);
+        size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
         if(feof(input)) break;
-        //erno = fileStrToTravInf(&travInf, input);
 
-        travInfFS.info = travInf;
-        travInfFS.nextOffset = -1;
+        infoFID.info = travInf;
+        infoFID.nextOffset = -1;
 
         if(prevIdOffset[travInf.srcId - 1] < 0){
             index.ID = travInf.srcId;
@@ -72,13 +73,13 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
             tail = insertIndex(tail, index);
 
-            fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
+            fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }else{
             fseek(output, prevIdOffset[travInf.srcId - 1], SEEK_SET);
             fwrite(&currOutputPos, sizeof(long), 1, output);
 
             fseek(output, currOutputPos, SEEK_SET);
-            fwrite(&travInfFS, sizeof(TravInfFID), 1, output);
+            fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }
 
         prevIdOffset[travInf.srcId - 1] = currOutputPos;
@@ -130,7 +131,7 @@ void csvToBin(FILE *input, FILE *output){
         /*-------------*/
 
         int erno = strFileToTravInf(&info, input);
-
+        if(feof(input)) break;
 
 
         fwrite(&info, sizeof(TravelInfo), 1, output);

@@ -1,1 +1,1 @@
-bin/server data/indexTable.bin
+bin/server 0 data/indexTable.bin notnow

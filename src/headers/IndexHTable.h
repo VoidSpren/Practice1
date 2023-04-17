@@ -101,20 +101,21 @@ void insertIndexHash(int key, long value, IndexHTable *table){
     }
 }
 
-bool keyExists(int key, IndexHTable *table){
+int getIfExists(int key, Index *index, IndexHTable *table){
     long i = hash(key, table->reserved);
 
     IndexNode *node = table->list[i];
 
     while(node != NULL){
         if(node->index.ID == key){
-            return true;
+            if(index != NULL) (*index) = node->index;
+            return 0;
         }
 
         node = node->next;
     }
 
-    return false;
+    return -1;
 }
 
 void printHTable(IndexHTable table){
