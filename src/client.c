@@ -50,9 +50,7 @@ int main(int argc, char* argv[]){
         );
         scanf("%i", &opt);
 
-        if(opt < 1 || opt > 5){
-        }
-
+        int status;
         switch(opt){
             case 1:
                 printf("\ningrese el id de origen (numero entero 1 - 1160): ");
@@ -82,7 +80,22 @@ int main(int argc, char* argv[]){
                 }
                 break;
             case 4:
-            
+                status = consultMeanTime(&info, shared);
+                if(status == SHARED_SUCCESS){
+                    printf(
+                        "\nconsulta exitosa\n"
+                        "id de origen: %i\n"
+                        "id de destino: %i\n"
+                        "hora del dia: %i\n"
+                        "media de tiempo del viaje: %f\n",
+                        info.srcId, info.destId, info.hourOD, info.meanTime
+                        );
+                }else{
+                    printf("status: %i\n", status);
+                    printTravI(info);
+                }
+
+                break;
             case 5:
                 printf("cerrando...\n");
 

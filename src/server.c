@@ -134,8 +134,13 @@ int main(int argc, char* argv[]){
 
         info = shared->info;
 
+        printTravI(info);
+
         int res = getIfExists(info.srcId, &index, &table);
-        if(res > 0){
+
+        printf("found?: %i", res);
+
+        if(res >= 0){
             res = searchInFile(&info, index.ogOffset, infoFile);
             if(res > 0){
                 shared->info = info;

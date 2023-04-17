@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "**/*.html": "html",
-        "**/templates/**/*.html": "django-html",
-        "stat.h": "c",
-        "mman.h": "c",
-        "fcntl.h": "c"
-    }
-}
