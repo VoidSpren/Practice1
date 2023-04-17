@@ -62,7 +62,9 @@ int main(int argc, char* argv[]){
 
     //Se rectifica que los parametros de entrada sean menos de 3
     if(argc != 4){
-        printf("usage: server {sharedMemName} {IndexTable} {IndexedInfo}\n");
+        printf("usage: server {
+            
+        } {IndexTable} {IndexedInfo}\n");
         return -1;
     }
 
@@ -88,8 +90,7 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-
-
+    //Se verifica que el nombre de la memoria compartida no este usado
     shm_unlink(argv[1]);
 
     //Se esta abriendo una memoria nombrada compartida
