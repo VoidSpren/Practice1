@@ -62,9 +62,7 @@ int main(int argc, char* argv[]){
 
     //Se rectifica que los parametros de entrada sean menos de 3
     if(argc != 4){
-        printf("usage: server {
-            
-        } {IndexTable} {IndexedInfo}\n");
+        printf("usage: server {sharedMemName} {IndexTable} {IndexedInfo}\n");
         return -1;
     }
 
