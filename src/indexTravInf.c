@@ -145,6 +145,7 @@ void csvToBin(FILE *input, FILE *output){
 }
 
 int main(int argc, char *argv[]){
+    //Se comprueba que no alla errores al ingresar los 4 archivos requeridos
     if(argc != 5){
         printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}");
         return -1;
@@ -153,22 +154,28 @@ int main(int argc, char *argv[]){
     FILE *input, *binIO, *output, *table;
     long outStart;
 
+    //Sa abre el csv para leerlo
     input = fopen(argv[1], "r");
     if(!input){
         printf("file {%s} failed to open", argv[1]);
         return -1;
     }
 
+    //Se abre el archivo donde se guardara el csv en binario
     binIO = fopen(argv[2], "wb");
     if(!binIO){
         printf("file {%s} failed to open", argv[2]);
         return -1;
     }
 
+    //Se pasa de csv a binario
     csvToBin(input, binIO);
-    fclose(input); fclose(binIO);
+    
+    fclose(input); 
+    fclose(binIO);
     binIO = NULL;
 
+    //
     binIO = fopen(argv[2], "rb");
     if(!binIO){
         printf("file {%s} failed to open", argv[2]);
