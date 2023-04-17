@@ -105,6 +105,7 @@ int main(int argc, char* argv[]){
         return -1;
     }   
     SharedMSG *shared = mmap(NULL, 2*sizeof(SharedMSG), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0);
+    shared->sharedStatus = SHARED_NOT_READY;
 
     erno = sem_init(&(shared->serverSem), 1, 0);
     if(erno < 0){
@@ -120,6 +121,7 @@ int main(int argc, char* argv[]){
     Index index;
     TravelInfo info;
 
+    shared->sharedStatus = SHARED_NOT_FOUND;
     while(1){
         printf("server ready\n");
 
