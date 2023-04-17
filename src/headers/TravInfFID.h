@@ -2,6 +2,7 @@
 
 #include <headers/TravelInfo.h>
 
+//Estructura que guarda la información de viaje y un indice para escribirlo la tabla indexada
 struct TRAVINFFID
 {
     long nextOffset;

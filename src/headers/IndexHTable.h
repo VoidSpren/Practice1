@@ -1,3 +1,5 @@
+//Implementación de la hashtable
+
 #pragma once
 
 #include <headers/Index.h>
@@ -6,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
+//Estrucuta de la hashtable que es una lista dinamica
 struct INDEXHTABLE
 {
     IndexNode **list;
@@ -15,12 +17,14 @@ struct INDEXHTABLE
     float loadFac;
 }typedef IndexHTable;
 
+//Función hash que requiere el tamaño total y valor del nodo a agregar
 long hash(int key, long size){
     long k = 268382559;
     long p = 1163;
     return ((k*key)%p)%size;
 }
 
+//Crea la hashTable y la inicializa 
 IndexHTable createIndexHTable(long reserved){
     IndexHTable table;
     table.reserved = (reserved)? reserved: 8;
@@ -33,6 +37,7 @@ IndexHTable createIndexHTable(long reserved){
     return table;
 }
 
+//Eliminar la hashtable
 void closeIndexHTable(IndexHTable *table){
     for(long i = 0; i < table->reserved; i++){
         deleteAll(table->list[i]);
@@ -44,6 +49,7 @@ void closeIndexHTable(IndexHTable *table){
     table->loadFac = 0;
 }
 
+//Insera un valor a la hashtable que no requiere redimensionarla
 void insertIndexHashNoResize(IndexHTable *table, Index index){
     long i = hash(index.ID, table->reserved);
 
@@ -56,6 +62,7 @@ void insertIndexHashNoResize(IndexHTable *table, Index index){
     table->size++;
 }
 
+//Expande el tamaño de la hashtable y vuelve a ingresar cada dato
 void expandRehash(IndexHTable *table){
     long nSize = table->reserved * 2;
     long prevSize = table->reserved;
@@ -81,6 +88,7 @@ void expandRehash(IndexHTable *table){
     free(auxList);
 }
 
+//Inserta cualquier nuevo valor a la hashtable determinanado si requiere o no redimensionarla
 void insertIndexHash(int key, long value, IndexHTable *table){
     float loadFactor = ((float)table->size + 1.f)/table->reserved;
 
@@ -101,6 +109,7 @@ void insertIndexHash(int key, long value, IndexHTable *table){
     }
 }
 
+//Función que determina si existe un valor especifico
 int getIfExists(int key, Index *index, IndexHTable *table){
     long i = hash(key, table->reserved);
 
@@ -118,6 +127,7 @@ int getIfExists(int key, Index *index, IndexHTable *table){
     return -1;
 }
 
+//Recorre e imprime la hashtable 
 void printHTable(IndexHTable table){
     printf("{\n");
     for(long i = 0; i < table.reserved; i++){
