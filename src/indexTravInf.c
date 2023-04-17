@@ -66,27 +66,40 @@ IndexNode* IndexFile(FILE* input, FILE* output){
         //Se guarda la posición del archivo donde se esta leyendo
         currOutputPos = ftell(output);
 
+        //Se lee la información del siguiente viaje y verifica si ya se llego al final del archivo
         size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
         if(feof(input)) break;
 
+        //Se guarda la info y un apuntador a -1 en la estructura infoFID
         infoFID.info = travInf;
         infoFID.nextOffset = -1;
 
         if(prevIdOffset[travInf.srcId - 1] < 0){
+            //En este caso es la primera vez que se encuentra este origen
+            
+            //Se crea un index con la estructura de la primera aparición del origen
             index.ID = travInf.srcId;
             index.ogOffset = currOutputPos;
 
+            //dicha estructura se guarda en la lista enlazada
             tail = insertIndex(tail, index);
 
+            //Se escribe esta estructura en el archivo
             fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }else{
+            //De ser diferente de -1 se busca esta posicion y se le colocar en vez de -1 
+            //el valor de la posición currOutputPos
             fseek(output, prevIdOffset[travInf.srcId - 1], SEEK_SET);
             fwrite(&currOutputPos, sizeof(long), 1, output);
 
+            //Luego se busca de nuevo la posición donde no se ha escrito aún
+            //y se escribe la estructura del nuevo viaje con el mismo origen
             fseek(output, currOutputPos, SEEK_SET);
             fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }
 
+        //En el valor en el array en la posición del origen se 
+        //coloca el desplazamiento donde se esta leyendo
         prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
         /*---loggin---*/
