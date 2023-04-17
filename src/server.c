@@ -142,7 +142,7 @@ int main(int argc, char* argv[]){
 
         if(res >= 0){
             res = searchInFile(&info, index.ogOffset, infoFile);
-            if(res > 0){
+            if(res >= 0){
                 shared->info = info;
                 shared->sharedStatus = SHARED_SUCCESS;
             }else{
