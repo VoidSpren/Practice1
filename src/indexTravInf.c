@@ -77,7 +77,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
         //Se lee la información del siguiente viaje y verifica si ya se llego al final del archivo de entrada
         size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
-        if(feof(input) || count != sizeof(TravelInfo)) break;
+        if(feof(input) || count != 1) break;
 
         //Se guarda la info de vaije y un apuntador a -1 (invalido) en la estructura infoFID
         infoFID.info = travInf;
@@ -163,7 +163,7 @@ void csvToBin(FILE *input, FILE *output){
         //Lee la información de un viaje y la guarda en un apuntador a la estructura info
         int erno = strFileToTravInf(&info, input);
         
-        //Soe comprueba si se termino de leer la información
+        //Se comprueba si se termino de leer la información
         if(feof(input)) break;
 
         //Escribe la escructura info binario en el archivo output
