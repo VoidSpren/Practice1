@@ -9,21 +9,31 @@
 #include <headers/SharedMsg.h>
 #include <headers/TravelInfo.h>
 
+//Cuando la lectura es erronea se debe dar un enter para reescribir la correcta
 void flushStdIn(){
     char c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+//Activa la consulta en el server pasando la info requerida
 int consultMeanTime(TravelInfo *info, SharedMSG *shared){
     
+    //Verifica que el server este listo
     if(shared->sharedStatus != SHARED_NOT_READY){
+
+        //Se guarda la información de consulta en la estructura de la memoria compartida
         shared->info = (*info);
+
+        //Envia la señal de que ya posteo lo requerido
         sem_post(&(shared->clientSem));
+
+        //Una vez el server avisa que ya realizo la consulta guarda en info el resultado de la busqueda
         sem_wait(&(shared->serverSem));
 
         (*info) = shared->info;
     }
     
+    //Retorna es status de la memoria compartida
     return shared->sharedStatus;
 }
 
