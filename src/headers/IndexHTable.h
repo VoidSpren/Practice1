@@ -8,7 +8,12 @@
 #include <stdio.h>
 #include <string.h>
 
-//Estrucuta de la hashtable que es una lista dinamica
+//k de la funcion hash calculado con la pagina https://www.calculator.net/random-number-generator.html
+#define HASHRANDOMK 268382559
+//primer primo despues del maximo id de origen
+#define HASHPRIME 1163
+
+//Estrucuta de la hashtable compuesta por una lista dinamica de listas enlazadas
 struct INDEXHTABLE
 {
     IndexNode **list;
@@ -17,14 +22,12 @@ struct INDEXHTABLE
     float loadFac;
 }typedef IndexHTable;
 
-//Función hash que requiere el tamaño total y valor del nodo a agregar
+//Función hash que requiere el tamaño total y el key al que aplicar el hash
 long hash(int key, long size){
-    long k = 268382559;
-    long p = 1163;
-    return ((k*key)%p)%size;
+    return ((HASHRANDOMK*key)%HASHPRIME)%size;
 }
 
-//Crea la hashTable y la inicializa 
+//Crea la hashTable y la inicializa con el tamaño especificado en reserved o 8 si se pasa 0
 IndexHTable createIndexHTable(long reserved){
     IndexHTable table;
     table.reserved = (reserved)? reserved: 8;
@@ -49,7 +52,7 @@ void closeIndexHTable(IndexHTable *table){
     table->loadFac = 0;
 }
 
-//Insera un valor a la hashtable que no requiere redimensionarla
+//Inserta un valor a la hashtable cuando no requiere redimensionarla
 void insertIndexHashNoResize(IndexHTable *table, Index index){
     long i = hash(index.ID, table->reserved);
 
@@ -109,7 +112,8 @@ void insertIndexHash(int key, long value, IndexHTable *table){
     }
 }
 
-//Función que determina si existe un valor especifico
+//Función que, si existe, guarda en el apuntador index provisto el valor del index
+//para la respectiva key, se retorna -1 si no existe y 0 si existe
 int getIfExists(int key, Index *index, IndexHTable table){
     long i = hash(key, table.reserved);
 
@@ -127,7 +131,7 @@ int getIfExists(int key, Index *index, IndexHTable table){
     return -1;
 }
 
-//Recorre e imprime la hashtable 
+//Recorre e imprime la hashtable (con proposito de depuarcion)
 void printHTable(IndexHTable table){
     printf("{\n");
     for(long i = 0; i < table.reserved; i++){
