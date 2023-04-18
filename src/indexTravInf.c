@@ -7,7 +7,7 @@
 
 //Se crea una lista enlazada de 
 IndexNode* IndexFile(FILE* input, FILE* output){
-    /*---loggin--*/
+    /*---logging--*/
     //Se calcula el tamaño del archivo y se guarda en inEnd
     long inEnd;
     fseek(input, 0, SEEK_END);
@@ -32,7 +32,10 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     //Se guarda la posicion de desplazamiento en bytes del archivo
     //Luego se lee la información de un viaje y la guarda en la estrucutra travInf
     currOutputPos = ftell(output);
-    fread(&travInf, sizeof(TravelInfo), 1, input);
+    erno = fread(&travInf, sizeof(TravelInfo), 1, input);
+    if(erno < 1){
+        printf("error reading input file\n");
+    }
 
     infoFID.info = travInf;
     infoFID.nextOffset = -1;
@@ -49,7 +52,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     //se guarda la posición donde leyó al archivo
     prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
-    /*---loggin---*/
+    /*---logging---*/
     int cycles = 0;
     /*-------------*/
     while(!feof(input)){
@@ -68,7 +71,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
         //Se lee la información del siguiente viaje y verifica si ya se llego al final del archivo
         size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
-        if(feof(input)) break;
+        if(feof(input) || count != sizeof(TravelInfo)) break;
 
         //Se guarda la info y un apuntador a -1 en la estructura infoFID
         infoFID.info = travInf;
@@ -102,7 +105,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
         //coloca el desplazamiento donde se esta leyendo
         prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
-        /*---loggin---*/
+        /*---logging---*/
         cycles++;
         /*-------------*/
     }
@@ -136,7 +139,8 @@ void csvToBin(FILE *input, FILE *output){
 
     //Se lee hasta el salto de linea descartando los encabezados del csv
     char trash[200];
-    fscanf(input, "%199s", trash);
+    int erno = fscanf(input, "%199s", trash);
+    if(erno == EOF) printf("failed to read csv input\n");
 
     TravelInfo info;
 

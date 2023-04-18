@@ -9,7 +9,7 @@
 #include <headers/SharedMsg.h>
 #include <headers/TravelInfo.h>
 
-flushStdIn(){
+void flushStdIn(){
     char c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
@@ -43,6 +43,7 @@ int main(int argc, char* argv[]){
 
     int opt;
     TravelInfo info;
+    int erno;
     while(1){
 
         printf(
@@ -54,14 +55,16 @@ int main(int argc, char* argv[]){
             "5. Salir\n"
             "\nopcion: "
         );
-        scanf("%i", &opt);
+        erno = scanf("%i", &opt);
+        if(erno != 1) printf("error leyendo dato provisto\n");
 
         int status;
         char c;
         switch(opt){
             case 1:
                 printf("\ningrese el id de origen (numero entero 1 - 1160): ");
-                scanf("%i", &(info.srcId));
+                erno = scanf("%i", &(info.srcId));
+                if(erno != 1) printf("error leyendo dato provisto\n");
 
                 if(info.srcId < 1 || info.srcId > 1160){
                     printf("valor invalido (valores validos de 1 a 1160)\n");
@@ -71,7 +74,8 @@ int main(int argc, char* argv[]){
                 break;
             case 2:
                 printf("\ningrese el id de destino (numero entero 1 - 1160): ");
-                scanf("%i", &(info.destId));
+                erno = scanf("%i", &(info.destId));
+                if(erno != 1) printf("error leyendo dato provisto\n");
 
                 if(info.destId < 1 || info.destId > 1160){
                     printf("valor invalido (valores validos de 1 a 1160)\n");
@@ -81,7 +85,8 @@ int main(int argc, char* argv[]){
                 break;
             case 3:
                 printf("\ningrese el hora del dia (numero entero 0 - 23): ");
-                scanf("%i", &(info.hourOD));
+                erno = scanf("%i", &(info.hourOD));
+                if(erno != 1) printf("error leyendo dato provisto\n");
 
                 if(info.hourOD < 0 || info.hourOD > 23){
                     printf("valor invalido (valores validos de 0 a 23)\n");

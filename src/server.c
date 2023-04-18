@@ -32,7 +32,10 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     fseek(file, 0, SEEK_SET);
 
     //Se recorrer el archivo y se guardan la información en la lista
-    fread(list, sizeof(Index), size, file);
+    size_t count = fread(list, sizeof(Index), size, file);
+    if(count != size){
+        printf("failed reading table file\n");
+    }
 
     for(long i = 0; i < size; i++){
         //Se recorre la lista y a cada elemento se agregar a la hashTable
@@ -47,7 +50,10 @@ int searchInFile(TravelInfo *info, long offset, FILE *input){
 
     while(!feof(input) && offset >= 0){
         fseek(input, offset, SEEK_SET);
-        fread(&readedInfFID, sizeof(TravInfFID), 1,input);
+        size_t count = fread(&readedInfFID, sizeof(TravInfFID), 1,input);
+        if(count < 1){
+            printf("failed reading indexed file\n");
+        }
 
         if(readedInfFID.info.destId == info->destId && readedInfFID.info.hourOD == info->hourOD){
             (*info) = readedInfFID.info;
@@ -131,8 +137,10 @@ int main(int argc, char* argv[]){
         printf("server ready\n");
 
         sem_wait(&(shared->clientSem));
-        start = clock();
+        
         printf("working... \n");
+
+        start = clock();
 
         shared->sharedStatus = SHARED_NOT_READY;
         info = shared->info;
