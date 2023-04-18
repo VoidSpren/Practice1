@@ -9,7 +9,7 @@
 #include <headers/SharedMsg.h>
 #include <headers/TravelInfo.h>
 
-//Cuando la lectura es erronea se debe dar un enter para reescribir la correcta
+//Cuando la lectura es erronea se debe limpiar el stream de entrada estandar
 void flushStdIn(){
     char c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -24,7 +24,7 @@ int consultMeanTime(TravelInfo *info, SharedMSG *shared){
         //Se guarda la información de consulta en la estructura de la memoria compartida
         shared->info = (*info);
 
-        //Envia la señal de que ya posteo lo requerido
+        //Envia la señal de que los datos necesarios estan listos
         sem_post(&(shared->clientSem));
 
         //Una vez el server avisa que ya realizo la consulta guarda en info el resultado de la busqueda
@@ -33,7 +33,7 @@ int consultMeanTime(TravelInfo *info, SharedMSG *shared){
         (*info) = shared->info;
     }
     
-    //Retorna es status de la memoria compartida
+    //Retorna el status de la memoria compartida
     return shared->sharedStatus;
 }
 
