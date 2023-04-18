@@ -48,22 +48,33 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     free(list);
 }
 
+//Busca un viaje especifico en el archivo
 int searchInFile(TravelInfo *info, long offset, FILE *input){
     TravInfFID readedInfFID;
 
+    //Verifica que la información sea correcta para buscar
     while(!feof(input) && offset >= 0){
+        
+        //Se coloca en la ubicación del la información 
         fseek(input, offset, SEEK_SET);
+
+        //Se lee una estructura TravInfID
         size_t count = fread(&readedInfFID, sizeof(TravInfFID), 1,input);
+
+        //Revisa si hay error al leer
         if(count < 1){
             printf("failed reading indexed file\n");
         }
 
+        //Rectifica si la información de destino y hora son las mismas
         if(readedInfFID.info.destId == info->destId && readedInfFID.info.hourOD == info->hourOD){
+            //Se guarda el resultado en *info
             (*info) = readedInfFID.info;
 
             return 0;
         }
 
+        //Si no se ha encontrado el resultado esperado se recorre a la siguiente aparicion del origen
         offset = readedInfFID.nextOffset;
     }
 
@@ -110,6 +121,7 @@ int main(int argc, char* argv[]){
         return -1;
     }
     
+    //Reserva el espacio en la memoria compartida para guardar la estructura SharedMSG
     int erno;
     erno = ftruncate(memFd, 2*sizeof(SharedMSG));
     if(erno < 0){
@@ -181,6 +193,7 @@ int main(int argc, char* argv[]){
         //Envía la señal de que se subio la información a la memoria compartida
         sem_post(&(shared->serverSem));
 
+        //Imprime el tiempo de ejecución
         diff = clock() - start;
         int msec = diff * 1000000 / CLOCKS_PER_SEC;
         printf("time in micros: %i\n", msec);
