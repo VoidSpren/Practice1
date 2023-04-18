@@ -1,4 +1,4 @@
-//Implementa funciones requeridas para el paso de información de csv a binario
+//estructura para comunicacion de informacion de viaje
 
 #pragma once
 
@@ -25,7 +25,7 @@ int strFileToTravInf(TravelInfo *info, FILE *file){
     );
 }
 
-//Imprime la información de un viaje
+//Imprime la información de un viaje (con propositos de depuracion)
 void printTravI(TravelInfo info){
     printf(
         "{\n"

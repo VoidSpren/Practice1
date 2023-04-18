@@ -1,4 +1,4 @@
-//Implementación de una lista enlazada
+//Implementación de indices y una lista enlazada para indices
 
 #pragma once
 
@@ -9,14 +9,14 @@ struct INDEX
     int ID;
 } typedef Index;
 
-//Estructura de la cual se compone la lista enlazada
+//Nodos de los cuales se compone la lista enlazada
 struct INDEXNODE
 {
     struct INDEXNODE *next;
     Index index;
 }typedef IndexNode;
 
-//Función para agregar un nodo a la lista
+//agrega un nodo a la lista
 IndexNode *insertIndex(IndexNode *node, Index val){
     IndexNode *newNode = (IndexNode*)malloc(sizeof(IndexNode));
     newNode->next = NULL;
@@ -31,7 +31,7 @@ IndexNode *insertIndex(IndexNode *node, Index val){
     return newNode;
 }
 
-//Función que permite eliminar un nodo especifico teniendo al padre
+//permite eliminar un nodo especifico teniendo al padre
 IndexNode *deleteNode(IndexNode *parent, IndexNode *node){
     if(node == NULL) return parent;
 

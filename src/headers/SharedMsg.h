@@ -4,7 +4,7 @@
 
 #include <headers/TravelInfo.h>
 
-//Los estados erroneos de memoria compartida 
+//Los estados posibles de memoria compartida 
 enum{
     SHARED_FAILED = -3, SHARED_NOT_FOUND, SHARED_NOT_READY, SHARED_SUCCESS
 };
