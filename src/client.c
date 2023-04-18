@@ -39,7 +39,7 @@ int consultMeanTime(TravelInfo *info, SharedMSG *shared){
 
 int main(int argc, char* argv[]){
 
-    //Se revisa que no ingresen más ni menos de dos archivos
+    //Se revisa que se ingrese el nombre de la memoria compartida y nada mas
     if(argc != 2){
         printf("usage: client {sharedMemName}\n");
         return -1;
@@ -154,7 +154,7 @@ int main(int argc, char* argv[]){
 
                 break;
             case 5:
-                //Envia mensaje de confirmación de cerrado y termina de ejcutarse el archivo
+                //Envia mensaje de confirmación de cerrado y termina de ejcutarse el programa
                 printf("cerrando...\n");
 
                 return 0;
