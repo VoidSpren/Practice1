@@ -119,11 +119,14 @@ int main(int argc, char* argv[]){
     SharedMSG *shared = mmap(NULL, 2*sizeof(SharedMSG), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0);
     shared->sharedStatus = SHARED_NOT_READY;
 
+    //Inicializa el semaforo para el server
     erno = sem_init(&(shared->serverSem), 1, 0);
     if(erno < 0){
         printf("failed to initialize server ready semaphore\n");
         return -1;
     }
+
+    //Inicializa el semaforo para el client
     erno = sem_init(&(shared->clientSem), 1, 0);
     if(erno < 0){
         printf("failed to initialize client ready semaphore\n");
@@ -135,33 +138,47 @@ int main(int argc, char* argv[]){
 
     clock_t start, diff;
 
+    //Se pone en status SHARED_NOT_FOUND
     shared->sharedStatus = SHARED_NOT_FOUND;
     while(1){
         printf("server ready\n");
 
+        //Se espera indicaciones del client
         sem_wait(&(shared->clientSem));
         
         printf("working... \n");
 
         start = clock();
 
+        //Se declara el semaforo en SHARED_NOT_READY 
         shared->sharedStatus = SHARED_NOT_READY;
+
+        //Se guarda la informacion de la memoria compartida en info
         info = shared->info;
 
+        //Revisa si existe el viaje que esta en info de la memoria compartida
         int res = getIfExists(info.srcId, &index, table);
-
+    
+        //Revisa si encontró la info
         if(res >= 0){
+
+            //Si existe se busca en el archivo y se guarda la información de viaje en info
             res = searchInFile(&info, index.ogOffset, infoFile);
             if(res >= 0){
+                //guarda en la memoria compartida el resultado *info
                 shared->info = info;
+                //actualiza el status de la memoria
                 shared->sharedStatus = SHARED_SUCCESS;
             }else{
+                //Si no encuentra el archivo el status es SHARED_NOT_FOUND
                 shared->sharedStatus = SHARED_NOT_FOUND;
             }
         }else{
+            //Si no se encontró el status es SHARED_NOT_FOUND
             shared->sharedStatus = SHARED_NOT_FOUND;
         }
         
+        //Envía la señal de que se subio la información a la memoria compartida
         sem_post(&(shared->serverSem));
 
         diff = clock() - start;
