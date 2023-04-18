@@ -150,37 +150,38 @@ int main(int argc, char* argv[]){
 
         start = clock();
 
-        //Se declara el semaforo en SHARED_NOT_READY 
+        //Se declara el status en SHARED_NOT_READY 
         shared->sharedStatus = SHARED_NOT_READY;
 
         //Se guarda la informacion de la memoria compartida en info
         info = shared->info;
 
-        //Revisa si existe el viaje que esta en info de la memoria compartida
+        //obtiene el indice para el id de origen si existe
         int res = getIfExists(info.srcId, &index, table);
     
-        //Revisa si encontró la info
+        //comprueba que el indice anterior existe
         if(res >= 0){
 
             //Si existe se busca en el archivo y se guarda la información de viaje en info
             res = searchInFile(&info, index.ogOffset, infoFile);
             if(res >= 0){
-                //guarda en la memoria compartida el resultado *info
+                //guarda en la memoria compartida el resultado info
                 shared->info = info;
                 //actualiza el status de la memoria
                 shared->sharedStatus = SHARED_SUCCESS;
             }else{
-                //Si no encuentra el archivo el status es SHARED_NOT_FOUND
+                //Si no se encuentra en el archivo el status es SHARED_NOT_FOUND
                 shared->sharedStatus = SHARED_NOT_FOUND;
             }
         }else{
-            //Si no se encontró el status es SHARED_NOT_FOUND
+            //Si no se existe el indice, el status es SHARED_NOT_FOUND
             shared->sharedStatus = SHARED_NOT_FOUND;
         }
         
         //Envía la señal de que se subio la información a la memoria compartida
         sem_post(&(shared->serverSem));
 
+        //calcula e imprime el tiempo utilizado para la consulta
         diff = clock() - start;
         int msec = diff * 1000000 / CLOCKS_PER_SEC;
         printf("time in micros: %i\n", msec);

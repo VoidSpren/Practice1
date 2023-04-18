@@ -154,7 +154,7 @@ int main(int argc, char* argv[]){
 
                 break;
             case 5:
-                //Envia mensaje de confirmación de cerrado y termina de ejcutarse el programa
+                //Envia mensaje de confirmación de cerrado y termina de ejecutarse el programa
                 printf("cerrando...\n");
 
                 return 0;
