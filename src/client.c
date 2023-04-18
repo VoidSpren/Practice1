@@ -79,10 +79,10 @@ int main(int argc, char* argv[]){
 
         int status;
         char c;
-        //hace un switch para cada caso seleccionado
+        //Hace un switch para cada caso seleccionado
         switch(opt){
             case 1:
-                //pide, lee y guarda el id de origen en el info.srcId
+                //Pide, lee y guarda el id de origen en el info.srcId
                 printf("\ningrese el id de origen (numero entero 1 - 1160): ");
                 erno = scanf("%i", &(info.srcId));
                 if(erno != 1) printf("error leyendo dato provisto\n");
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
                 }
                 break;
             case 2:
-                //pide, lee y guarda el id de destino en el info.destID
+                //Pide, lee y guarda el id de destino en el info.destID
                 printf("\ningrese el id de destino (numero entero 1 - 1160): ");
                 erno = scanf("%i", &(info.destId));
                 if(erno != 1) printf("error leyendo dato provisto\n");
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]){
                 }
                 break;
             case 3:
-                //pide, lee y guarda la hora en el info.hourOD
+                //Pide, lee y guarda la hora en el info.hourOD
                 printf("\ningrese el hora del dia (numero entero 0 - 23): ");
                 erno = scanf("%i", &(info.hourOD));
                 if(erno != 1) printf("error leyendo dato provisto\n");
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]){
                 return 0;
                 
             default:
-                //Si se seleccina una opción distinta a las 5 envia error
+                //Si se selecciona una opción distinta a las 5 envia error
                 printf("\nopcion invalida, opciones validas solo de 1-5\n");
                 flushStdIn();
                 break;
