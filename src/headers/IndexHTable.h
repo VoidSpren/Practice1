@@ -111,16 +111,21 @@ void insertIndexHash(int key, long value, IndexHTable *table){
 
 //Función que determina si existe un valor especifico
 int getIfExists(int key, Index *index, IndexHTable table){
+    //Realiza hash de la key 
     long i = hash(key, table.reserved);
 
+    //Se busca en la posición del id origen y se guarda en *node
     IndexNode *node = table.list[i];
 
     while(node != NULL){
+        //Si se encuentra se revisa si el nodo encontrado es el mismo buscado
         if(node->index.ID == key){
+            //Si lo es, entonces se guarda en *node
             if(index != NULL) (*index) = node->index;
             return 0;
         }
 
+        //
         node = node->next;
     }
 
