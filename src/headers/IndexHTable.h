@@ -110,10 +110,10 @@ void insertIndexHash(int key, long value, IndexHTable *table){
 }
 
 //Función que determina si existe un valor especifico
-int getIfExists(int key, Index *index, IndexHTable *table){
-    long i = hash(key, table->reserved);
+int getIfExists(int key, Index *index, IndexHTable table){
+    long i = hash(key, table.reserved);
 
-    IndexNode *node = table->list[i];
+    IndexNode *node = table.list[i];
 
     while(node != NULL){
         if(node->index.ID == key){
