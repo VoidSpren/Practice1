@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <semaphore.h>
+#include <time.h>
+
 #include <headers/TravelInfo.h>
 #include <headers/TravInfFID.h>
 #include <headers/Index.h>
@@ -49,6 +51,7 @@ int searchInFile(TravelInfo *info, long offset, FILE *input){
 
         if(readedInfFID.info.destId == info->destId && readedInfFID.info.hourOD == info->hourOD){
             (*info) = readedInfFID.info;
+
             return 0;
         }
 
@@ -121,24 +124,20 @@ int main(int argc, char* argv[]){
     Index index;
     TravelInfo info;
 
+    clock_t start, diff;
+
     shared->sharedStatus = SHARED_NOT_FOUND;
     while(1){
         printf("server ready\n");
 
-        sem_post(&(shared->serverSem));
         sem_wait(&(shared->clientSem));
-
+        start = clock();
         printf("working... \n");
 
         shared->sharedStatus = SHARED_NOT_READY;
-
         info = shared->info;
 
-        printTravI(info);
-
         int res = getIfExists(info.srcId, &index, &table);
-
-        printf("found?: %i", res);
 
         if(res >= 0){
             res = searchInFile(&info, index.ogOffset, infoFile);
@@ -151,6 +150,12 @@ int main(int argc, char* argv[]){
         }else{
             shared->sharedStatus = SHARED_NOT_FOUND;
         }
+        
+        sem_post(&(shared->serverSem));
+
+        diff = clock() - start;
+        int msec = diff * 1000000 / CLOCKS_PER_SEC;
+        printf("time in micros: %i\n", msec);
     }
 
     return 0;

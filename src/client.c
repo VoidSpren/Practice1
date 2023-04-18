@@ -9,6 +9,11 @@
 #include <headers/SharedMsg.h>
 #include <headers/TravelInfo.h>
 
+flushStdIn(){
+    char c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
 int consultMeanTime(TravelInfo *info, SharedMSG *shared){
     if(shared->sharedStatus != SHARED_NOT_READY){
         shared->info = (*info);
@@ -39,6 +44,7 @@ int main(int argc, char* argv[]){
     int opt;
     TravelInfo info;
     while(1){
+
         printf(
             "\nBienvenido\n\n"
             "1. Ingresar origen\n"
@@ -51,6 +57,7 @@ int main(int argc, char* argv[]){
         scanf("%i", &opt);
 
         int status;
+        char c;
         switch(opt){
             case 1:
                 printf("\ningrese el id de origen (numero entero 1 - 1160): ");
@@ -59,6 +66,7 @@ int main(int argc, char* argv[]){
                 if(info.srcId < 1 || info.srcId > 1160){
                     printf("valor invalido (valores validos de 1 a 1160)\n");
                     info.srcId = 0;
+                    flushStdIn();
                 }
                 break;
             case 2:
@@ -68,6 +76,7 @@ int main(int argc, char* argv[]){
                 if(info.destId < 1 || info.destId > 1160){
                     printf("valor invalido (valores validos de 1 a 1160)\n");
                     info.destId = 0;
+                    flushStdIn();
                 }
                 break;
             case 3:
@@ -77,6 +86,7 @@ int main(int argc, char* argv[]){
                 if(info.hourOD < 0 || info.hourOD > 23){
                     printf("valor invalido (valores validos de 0 a 23)\n");
                     info.hourOD = 0;
+                    flushStdIn();
                 }
                 break;
             case 4:
@@ -90,10 +100,14 @@ int main(int argc, char* argv[]){
                         "media de tiempo del viaje: %f\n",
                         info.srcId, info.destId, info.hourOD, info.meanTime
                         );
+
                 }else{
-                    printf("status: %i\n", status);
-                    printTravI(info);
+                    printf("\ncoincidencia no encontrada\n");
                 }
+
+                printf("\nenter para continuar...\n");
+                getchar();
+                getchar();
 
                 break;
             case 5:
@@ -103,6 +117,7 @@ int main(int argc, char* argv[]){
                 
             default:
                 printf("\nopcion invalida, opciones validas solo de 1-5\n");
+                flushStdIn();
                 break;
         }
     }
