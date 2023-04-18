@@ -145,7 +145,7 @@ int main(int argc, char* argv[]){
         shared->sharedStatus = SHARED_NOT_READY;
         info = shared->info;
 
-        int res = getIfExists(info.srcId, &index, &table);
+        int res = getIfExists(info.srcId, &index, table);
 
         if(res >= 0){
             res = searchInFile(&info, index.ogOffset, infoFile);
