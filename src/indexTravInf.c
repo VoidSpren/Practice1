@@ -5,7 +5,10 @@
 #include <headers/TravelInfo.h>
 #include <headers/TravInfFID.h>
 
-//Se crea una lista enlazada de 
+//souce id maximo
+#define MAXSRCID 1160
+
+//crea un archivo indexado con la informacionde viaje del archivp de entrada
 IndexNode* IndexFile(FILE* input, FILE* output){
     /*---logging--*/
     //Se calcula el tamaño del archivo y se guarda en inEnd
@@ -17,8 +20,8 @@ IndexNode* IndexFile(FILE* input, FILE* output){
 
     printf("----------Indexing and generating table------------\n");
     
-    //Se crea un arreglo del tamaño 11160 y se llena con -1
-    long prevIdOffset[1160];
+    //Se crea un arreglo del tamaño 1160 y se llena con -1
+    long prevIdOffset[MAXSRCID];
     memset(prevIdOffset, -1, sizeof(prevIdOffset));
 
     long currOutputPos;
@@ -29,7 +32,7 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     TravInfFID infoFID;
     Index index;
 
-    //Se guarda la posicion de desplazamiento en bytes del archivo
+    //Se guarda la posicion de desplazamiento en bytes del archivo de salida
     //Luego se lee la información de un viaje y la guarda en la estrucutra travInf
     currOutputPos = ftell(output);
     erno = fread(&travInf, sizeof(TravelInfo), 1, input);
@@ -40,16 +43,19 @@ IndexNode* IndexFile(FILE* input, FILE* output){
     infoFID.info = travInf;
     infoFID.nextOffset = -1;
 
+    //se crea un indice con el id de origen y la posicion de desplazamiento del archivo de salida leida
     index.ID = travInf.srcId;
     index.ogOffset = currOutputPos;
 
+    //se crea un lista enlazada de indices que guardara la posicion de desplazamiento del archivo de salida
+    //donde esta por primera vez el id de origen guardado en el indice
     head = insertIndex(NULL, index);
     tail = head;
 
     fwrite(&infoFID, sizeof(TravInfFID), 1, output);
 
     //En la posición correpondiente del numero de origen - 1
-    //se guarda la posición donde leyó al archivo
+    //se guarda la posición donde se escribio al archivo
     prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
     /*---logging---*/
@@ -66,43 +72,44 @@ IndexNode* IndexFile(FILE* input, FILE* output){
         }
         /*-------------*/
 
-        //Se guarda la posición del archivo donde se esta leyendo
+        //Se guarda la posición del archivo donde se esta escribiendos
         currOutputPos = ftell(output);
 
-        //Se lee la información del siguiente viaje y verifica si ya se llego al final del archivo
+        //Se lee la información del siguiente viaje y verifica si ya se llego al final del archivo de entrada
         size_t count = fread(&travInf, sizeof(TravelInfo), 1, input);
         if(feof(input) || count != sizeof(TravelInfo)) break;
 
-        //Se guarda la info y un apuntador a -1 en la estructura infoFID
+        //Se guarda la info de vaije y un apuntador a -1 (invalido) en la estructura infoFID
         infoFID.info = travInf;
         infoFID.nextOffset = -1;
 
         if(prevIdOffset[travInf.srcId - 1] < 0){
-            //En este caso es la primera vez que se encuentra este origen
+            //En este caso es la primera vez que se encuentra este id de origen
             
-            //Se crea un index con la estructura de la primera aparición del origen
+            //Se crea un index con el desplazamiento actual en el archivo de salida
             index.ID = travInf.srcId;
             index.ogOffset = currOutputPos;
 
-            //dicha estructura se guarda en la lista enlazada
+            //dicha estructura se agrega a la lista enlazada
             tail = insertIndex(tail, index);
 
             //Se escribe esta estructura en el archivo
             fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }else{
-            //De ser diferente de -1 se busca esta posicion y se le colocar en vez de -1 
-            //el valor de la posición currOutputPos
+            //De prevIdOffset[travInf.srcId - 1] ser diferente de -1 se usa la
+            //posicion guardada en ese punto y se remplaza el desplazamiento de
+            //la estructura guardada en el archivo por el valor de la posición currOutputPos
             fseek(output, prevIdOffset[travInf.srcId - 1], SEEK_SET);
             fwrite(&currOutputPos, sizeof(long), 1, output);
 
-            //Luego se busca de nuevo la posición donde no se ha escrito aún
+            //Luego se vuelve a la posición donde no se ha escrito aún
             //y se escribe la estructura del nuevo viaje con el mismo origen
             fseek(output, currOutputPos, SEEK_SET);
             fwrite(&infoFID, sizeof(TravInfFID), 1, output);
         }
 
-        //En el valor en el array en la posición del origen se 
-        //coloca el desplazamiento donde se esta leyendo
+        // en el array en la posición del id de origen - 1 se 
+        //coloca el desplazamiento de la ultima estructura de viaje escrita
         prevIdOffset[travInf.srcId - 1] = currOutputPos;
 
         /*---logging---*/
