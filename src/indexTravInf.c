@@ -135,7 +135,7 @@ void saveIndexTable(FILE *file, IndexNode *node){
 
 //Pasa el csv a binario
 void csvToBin(FILE *input, FILE *output){
-    //Se calcula la el tamaño en bytes del csv
+    //Se calcula el tamaño del csv
     long inEnd;
     fseek(input, 0, SEEK_END);
     inEnd = ftell(input);
@@ -151,7 +151,7 @@ void csvToBin(FILE *input, FILE *output){
 
     TravelInfo info;
 
-    //Empieza la conversión y cuanta los ciclos
+    //Empieza la conversión y cuenta de los ciclos
     int cycles = 0;
     while(!feof(input)){
         //Cada 100.000 ciclos muestra el porcentaje de avance 
@@ -163,13 +163,12 @@ void csvToBin(FILE *input, FILE *output){
         //Lee la información de un viaje y la guarda en un apuntador a la estructura info
         int erno = strFileToTravInf(&info, input);
         
-        //Solo comprueba si ya termino de leer la información y evita leer la ultima vez
+        //Soe comprueba si se termino de leer la información
         if(feof(input)) break;
 
         //Escribe la escructura info binario en el archivo output
         fwrite(&info, sizeof(TravelInfo), 1, output);
 
-        //loging
         cycles++;
     }
 
@@ -177,7 +176,7 @@ void csvToBin(FILE *input, FILE *output){
 }
 
 int main(int argc, char *argv[]){
-    //Se comprueba que no alla errores al ingresar los 4 archivos requeridos
+    //Se comprueba que no haya errores al ingresar los 4 archivos requeridos
     if(argc != 5){
         printf("usage: indexTI {inputFile} {binioFile} {outputFile} {outputTableFile}\n");
         return -1;
@@ -221,7 +220,7 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    //Se abre un archivo para guardar la lista enlazda de las primeras apariciones
+    //Se abre un archivo para guardar la lista enlazada de las primeras apariciones
     table = fopen(argv[4], "wb");
     if(!table){
         printf("file {%s} failed to open", argv[4]);
@@ -233,6 +232,8 @@ int main(int argc, char *argv[]){
     saveIndexTable(table, IndexFile(binIO, output));   
 
     fclose(binIO);
+
+    //see borra el archivo csv en binario
     remove(argv[2]);
     
     return 0;
