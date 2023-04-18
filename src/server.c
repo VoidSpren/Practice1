@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    //Se inicializa la hashtable y llena con la información del archivo
+    //Se inicializa la hashtable 1547 y llena con la información del archivo
     IndexHTable table = createIndexHTable(HASHRESERVE);
     readAndHashTable(tableFile, &table);
 
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    //Se verifica que el nombre de la memoria compartida no este usado y se cierra
+    //Se verifica que el nombre de la memoria compartida no este usado 
     shm_unlink(argv[1]);
 
     //Se abre memoria compartida nombrada
