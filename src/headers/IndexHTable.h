@@ -40,7 +40,7 @@ IndexHTable createIndexHTable(long reserved){
     return table;
 }
 
-//Eliminar la hashtable
+//Elimina la hashtable
 void closeIndexHTable(IndexHTable *table){
     for(long i = 0; i < table->reserved; i++){
         deleteAll(table->list[i]);
