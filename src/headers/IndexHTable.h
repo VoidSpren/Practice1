@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-//Estrucuta de la hashtable que es una lista dinamica
+//Estructura de la hashtable que es una lista dinamica
 struct INDEXHTABLE
 {
     IndexNode **list;
@@ -37,7 +37,7 @@ IndexHTable createIndexHTable(long reserved){
     return table;
 }
 
-//Eliminar la hashtable
+//Elimina la hashtable
 void closeIndexHTable(IndexHTable *table){
     for(long i = 0; i < table->reserved; i++){
         deleteAll(table->list[i]);
@@ -49,7 +49,7 @@ void closeIndexHTable(IndexHTable *table){
     table->loadFac = 0;
 }
 
-//Insera un valor a la hashtable que no requiere redimensionarla
+//Inserta un valor a la hashtable que no requiere redimensionarla
 void insertIndexHashNoResize(IndexHTable *table, Index index){
     long i = hash(index.ID, table->reserved);
 
