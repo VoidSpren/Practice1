@@ -13,8 +13,11 @@
 #include <headers/IndexHTable.h>
 #include <headers/SharedMsg.h>
 
+//numero escogido de manera que el hastable de indices no necesite cambiar su tamaño reservado
+#define HASHRESERVE 1547
 
-//Metodo que lee el archivo entrante y lo vuelve una hashtable
+
+//Metodo que lee el archivo con la tabla de indices y lo vuelve una hashtable
 void readAndHashTable(FILE *file, IndexHTable *table){
     Index *list;
 
@@ -24,14 +27,14 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     //Se inicializa la lista reservando un espacio del tamaño del archivo
     list = (Index*)malloc(ftell(file));
 
-    //Y se calcula la cantidad de indices dividiendo en tamaño del archivo 
-    //en el tamaño de la estructura
+    //se calcula la cantidad de indices dividiendo el tamaño del archivo 
+    //en el tamaño de la estructura Index
     long size = ftell(file)/sizeof(Index);
 
     //Se vuelve al inicio del archivo
     fseek(file, 0, SEEK_SET);
 
-    //Se recorrer el archivo y se guardan la información en la lista
+    //Se lee el archivo y se guardan la información en la lista
     size_t count = fread(list, sizeof(Index), size, file);
     if(count != size){
         printf("failed reading table file\n");
@@ -69,7 +72,7 @@ int searchInFile(TravelInfo *info, long offset, FILE *input){
 
 int main(int argc, char* argv[]){
 
-    //Se rectifica que los parametros de entrada sean menos de 3
+    //Se rverifica que los parametros de entrada sean 4
     if(argc != 4){
         printf("usage: server {sharedMemName} {IndexTable} {IndexedInfo}\n");
         return -1;
@@ -85,7 +88,7 @@ int main(int argc, char* argv[]){
     }
 
     //Se inicializa la hashtable y llena con la información del archivo
-    IndexHTable table = createIndexHTable(1547);
+    IndexHTable table = createIndexHTable(HASHRESERVE);
     readAndHashTable(tableFile, &table);
 
     fclose(tableFile);
@@ -97,10 +100,10 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    //Se verifica que el nombre de la memoria compartida no este usado
+    //Se verifica que el nombre de la memoria compartida no este usado y se cierra
     shm_unlink(argv[1]);
 
-    //Se esta abriendo una memoria nombrada compartida
+    //Se abre memoria compartida nombrada
     int memFd = shm_open(argv[1], O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     if(memFd < 0){
         printf("failed to create shared mem file descriptor with name: %s\n", argv[1]);
