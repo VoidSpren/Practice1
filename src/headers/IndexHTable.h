@@ -24,18 +24,23 @@ struct INDEXHTABLE
 
 //Función hash que requiere el tamaño total y el key al que aplicar el hash
 long hash(int key, long size){
-    return ((HASHRANDOMK*key)%HASHPRIME)%size;
+    long h = ((HASHRANDOMK*(long)key)%HASHPRIME)%size;
+    if(h < 0) printf("error negativa hash\n");
+
+    return h;
 }
 
 //Crea la hashTable y la inicializa con el tamaño especificado en reserved o 8 si se pasa 0
 IndexHTable createIndexHTable(long reserved){
     IndexHTable table;
     table.reserved = (reserved)? reserved: 8;
+
     table.list = (IndexNode**)malloc(table.reserved * sizeof(IndexNode*));
+
     table.size = 0;
     table.loadFac = 0;
 
-    memset(table.list, 0, 8 * sizeof(IndexNode*));
+    memset(table.list, 0, table.reserved * sizeof(IndexNode*));
     
     return table;
 }
@@ -99,7 +104,6 @@ void insertIndexHash(int key, long value, IndexHTable *table){
         Index index;
         index.ID = key;
         index.ogOffset = value;
-
         expandRehash(table);
         insertIndexHashNoResize(table, index);
     }else{

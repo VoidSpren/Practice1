@@ -26,6 +26,7 @@ void readAndHashTable(FILE *file, IndexHTable *table){
 
     //Se inicializa la lista reservando un espacio del tamaño del archivo
     list = (Index*)malloc(ftell(file));
+    
 
     //se calcula la cantidad de indices dividiendo el tamaño del archivo 
     //en el tamaño de la estructura Index
@@ -39,7 +40,6 @@ void readAndHashTable(FILE *file, IndexHTable *table){
     if(count != size){
         printf("failed reading table file\n");
     }
-
     for(long i = 0; i < size; i++){
         //Se recorre la lista y a cada elemento se agregar a la hashTable
         insertIndexHash(list[i].ID, list[i].ogOffset, table);
@@ -129,6 +129,7 @@ int main(int argc, char* argv[]){
         return -1;
     }   
     SharedMSG *shared = mmap(NULL, 2*sizeof(SharedMSG), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0);
+    if(shared == NULL) printf("error shared mem\n");
     shared->sharedStatus = SHARED_NOT_READY;
 
     //Inicializa el semaforo para el server
